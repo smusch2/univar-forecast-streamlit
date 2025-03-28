@@ -53,9 +53,9 @@ if uploaded_file:
     test = df.iloc[-pred_steps:]
 
     # ARIMA hyperparameter tuning
-    p_values = range(0, 4)
-    d_values = range(0, 4)
-    q_values = range(0, 4)
+    p_values = range(0, 2)
+    d_values = range(0, 2)
+    q_values = range(0, 2)
 
     best_aic = np.inf
     best_order = None
