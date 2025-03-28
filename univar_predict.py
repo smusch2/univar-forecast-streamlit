@@ -71,7 +71,7 @@ if uploaded_file:
         label="Set seasonal value (m)",
         min_value=1,
         max_value=52,
-        value=5,
+        value=52,
         help="Number of seasonal periods in your data. For example, use 12 for monthly data with yearly seasonality."
     )
 
