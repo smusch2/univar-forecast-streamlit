@@ -18,10 +18,10 @@ warnings.filterwarnings("ignore", category=ConvergenceWarning)
 plt.style.use('fivethirtyeight')
 
 st.set_page_config(page_title="Univariate Forecast App - SARIMA", layout="wide")
-st.title("📈 Univariate Forecast App")
+st.title("📈 Univariate Forecast App - SARIMA")
 
 st.markdown("""
-This app uses a **univariate time series model** (ARIMA) to forecast future values based only on historical trends of a single variable.  
+This app uses a **univariate time series model** (SARIMA) to forecast future values based only on historical trends of a single variable.  
 Why use a univariate model instead of simply comparing to the same period last year?
 
 - It can **capture seasonality, trend, and noise** in the data more flexibly.
