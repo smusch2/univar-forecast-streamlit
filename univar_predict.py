@@ -8,6 +8,10 @@ from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
 import matplotlib.pyplot as plt
 import warnings
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from sklearn.metrics import mean_squared_error
+import random
+import warnings
 
 # Suppress warnings and apply visual style
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
@@ -52,33 +56,65 @@ if uploaded_file:
     train = df.iloc[:-pred_steps]
     test = df.iloc[-pred_steps:]
 
-    # ARIMA hyperparameter tuning
-    p_values = range(0, 2)
-    d_values = range(0, 2)
-    q_values = range(0, 2)
+
+    # Define parameter ranges
+    p_values = range(0, 3)
+    d_values = range(0, 3)
+    q_values = range(0, 3)
+    P_values = range(0, 3)
+    D_values = range(0, 3)
+    Q_values = range(0, 3)
+    #m = 5  # seasonal period
+
+    # Let the user set the seasonal value "m"
+    m = st.number_input(
+        label="Set seasonal value (m)",
+        min_value=1,
+        max_value=52,
+        value=5,
+        help="Number of seasonal periods in your data. For example, use 12 for monthly data with yearly seasonality."
+    )
+
+    # Generate random combinations of parameters
+    param_combinations = [(p, d, q, P, D, Q) 
+                        for p in p_values 
+                        for d in d_values 
+                        for q in q_values 
+                        for P in P_values 
+                        for D in D_values 
+                        for Q in Q_values]
+
+    random.seed(42)
+    random.shuffle(param_combinations)
+    sample_combinations = param_combinations[:25]  # sample 25 random combinations
 
     best_aic = np.inf
     best_order = None
+    best_seasonal_order = None
     best_model = None
 
-    for p in p_values:
-        for d in d_values:
-            for q in q_values:
-                try:
-                    model = ARIMA(train, order=(p, d, q)).fit()
-                    if model.aic < best_aic:
-                        best_aic = model.aic
-                        best_order = (p, d, q)
-                        best_model = model
-                except:
-                    continue
+    for (p, d, q, P, D, Q) in sample_combinations:
+        try:
+            model = SARIMAX(train, order=(p, d, q), seasonal_order=(P, D, Q, m)).fit(disp=False)
+            if model.aic < best_aic:
+                best_aic = model.aic
+                best_order = (p, d, q)
+                best_seasonal_order = (P, D, Q, m)
+                best_model = model
+        except:
+            continue
 
-    st.success(f"Best ARIMA order: {best_order}")
+    print(f"Best SARIMA order: {best_order}")
+    print(f"Best seasonal order: {best_seasonal_order}")
 
     # Forecast
-    forecast_res = best_model.get_forecast(steps=pred_steps)
-    forecast = forecast_res.predicted_mean
-    conf_int = forecast_res.conf_int()
+    pred = best_model.get_prediction(start=len(train), end=len(train)+len(test)-1, dynamic=False)
+    forecast = pred.predicted_mean
+    conf_int = pred.conf_int()
+
+    # Calculate error
+    error = mean_squared_error(test, forecast)
+    print(f'Mean Squared Error: {error:.2f}')
 
     forecast.index = test.index  # Ensure alignment
 
