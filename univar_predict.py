@@ -17,7 +17,7 @@ import warnings
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 plt.style.use('fivethirtyeight')
 
-st.set_page_config(page_title="Univariate Forecast App", layout="wide")
+st.set_page_config(page_title="Univariate Forecast App - SARIMA", layout="wide")
 st.title("📈 Univariate Forecast App")
 
 st.markdown("""
